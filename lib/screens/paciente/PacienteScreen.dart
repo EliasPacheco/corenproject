@@ -1,16 +1,17 @@
-import 'package:corenproject/paciente/DetalhesPaciente.dart';
-import 'package:corenproject/paciente/addpaciente.dart';
+import 'package:corenproject/drawer.dart';
+import 'package:corenproject/screens/paciente/DetalhesPaciente.dart';
+import 'package:corenproject/screens/paciente/addpaciente.dart';
 import 'package:corenproject/sign/LoginScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class PacienteScreen extends StatefulWidget {
+class IdentificacaoScreen extends StatefulWidget {
   @override
-  _PacienteScreenState createState() => _PacienteScreenState();
+  _IdentificacaoScreenState createState() => _IdentificacaoScreenState();
 }
 
-class _PacienteScreenState extends State<PacienteScreen> {
+class _IdentificacaoScreenState extends State<IdentificacaoScreen> {
   TextEditingController _searchController = TextEditingController();
   String? _currentEnfermeiro;
   late Stream<QuerySnapshot> _pacientesStream;
@@ -39,26 +40,6 @@ class _PacienteScreenState extends State<PacienteScreen> {
         .snapshots();
   }
 
-  void _signOut(BuildContext context) async {
-    try {
-      await FirebaseAuth.instance.signOut();
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => LoginScreen()),
-        (Route<dynamic> route) => false,
-      );
-    } catch (error) {
-      print('Erro ao sair da conta: $error');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Erro ao sair da conta. Por favor, tente novamente.',
-          ),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
 
   void _verDetalhesPaciente(
       BuildContext context, QueryDocumentSnapshot<Object?> paciente) {
@@ -76,23 +57,16 @@ class _PacienteScreenState extends State<PacienteScreen> {
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-          'Meus Pacientes',
+          'Identificação Pacientes',
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
         ),
+        iconTheme: IconThemeData(color: Colors.white),
         backgroundColor: Colors.blue,
-        actions: [
-          IconButton(
-            onPressed: () => _signOut(context),
-            icon: Icon(
-              Icons.exit_to_app,
-              color: Colors.red,
-            ),
-          )
-        ],
       ),
+      drawer: DrawerScreen(),
       body: Column(
         children: [
           Padding(
@@ -195,6 +169,7 @@ class _PacienteScreenState extends State<PacienteScreen> {
           );
         },
         child: Icon(Icons.add),
+        backgroundColor: Colors.blue,
       ),
     );
   }

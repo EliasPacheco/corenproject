@@ -18,23 +18,17 @@ class _CadastroScreenState extends State<CadastroScreen> {
       final String email = _emailController.text.trim();
       final String senha = _senhaController.text.trim();
       
-      // Criação do usuário no Firebase Authentication
       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
         password: senha,
       );
 
-      // Adicionando informações extras no Firestore
       await FirebaseFirestore.instance.collection('enfermeiros').doc(userCredential.user!.uid).set({
         'nome': _nomeController.text.trim(),
         'email': email,
-        'admin': false, // Definindo o valor padrão de admin como false
+        'admin': false,
       });
 
-      // Navegação para a próxima tela ou qualquer outra ação necessária após o cadastro
-      // Exemplo: Navigator.pushReplacementNamed(context, '/home');
-      
-      // Limpar os campos após o cadastro
       _nomeController.clear();
       _emailController.clear();
       _senhaController.clear();
@@ -59,16 +53,25 @@ class _CadastroScreenState extends State<CadastroScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Cadastro'),
+        title: Text('Cadastro', style: TextStyle(color: Colors.white),),
+        backgroundColor: Colors.blue,
+        centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: CadastroForm(
-          formKey: _formKey,
-          nomeController: _nomeController,
-          emailController: _emailController,
-          senhaController: _senhaController,
-          onCadastrar: () => _cadastrar(context),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Card(
+            elevation: 5,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: CadastroForm(
+                formKey: _formKey,
+                nomeController: _nomeController,
+                emailController: _emailController,
+                senhaController: _senhaController,
+                onCadastrar: () => _cadastrar(context),
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -104,7 +107,10 @@ class _CadastroFormState extends State<CadastroForm> {
         children: <Widget>[
           TextFormField(
             controller: widget.nomeController,
-            decoration: InputDecoration(labelText: 'Nome'),
+            decoration: InputDecoration(
+              labelText: 'Nome',
+              icon: Icon(Icons.person),
+            ),
             textCapitalization: TextCapitalization.words,
             validator: (value) {
               if (value!.isEmpty) {
@@ -115,7 +121,10 @@ class _CadastroFormState extends State<CadastroForm> {
           ),
           TextFormField(
             controller: widget.emailController,
-            decoration: InputDecoration(labelText: 'Email'),
+            decoration: InputDecoration(
+              labelText: 'Email',
+              icon: Icon(Icons.email),
+            ),
             validator: (value) {
               if (value!.isEmpty) {
                 return 'Por favor, insira seu email';
@@ -126,7 +135,10 @@ class _CadastroFormState extends State<CadastroForm> {
           ),
           TextFormField(
             controller: widget.senhaController,
-            decoration: InputDecoration(labelText: 'Senha'),
+            decoration: InputDecoration(
+              labelText: 'Senha',
+              icon: Icon(Icons.lock),
+            ),
             obscureText: true,
             validator: (value) {
               if (value!.isEmpty) {

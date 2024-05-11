@@ -1,5 +1,6 @@
-import 'package:corenproject/home/Homescreen.dart';
-import 'package:corenproject/paciente/PacienteScreen.dart';
+import 'package:corenproject/homeadmin/Homescreenadmin.dart';
+import 'package:corenproject/homescreen/HomeScreen.dart';
+import 'package:corenproject/screens/paciente/PacienteScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -67,9 +68,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
       // Navegação para a próxima tela após o login
       if (isAdmin) {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: ((context) => HomeScreen())));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: ((context) => HomeScreenAdmin())));
       } else {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: ((context) => PacienteScreen())));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: ((context) => HomeScreen())));
       }
     } catch (error) {
       print('Erro ao fazer login: $error');

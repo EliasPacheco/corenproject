@@ -20,7 +20,8 @@ class _AddPacienteState extends State<AddPaciente> {
   TextEditingController _allergiesController = TextEditingController();
   TextEditingController _symptomsController = TextEditingController();
   TextEditingController _nursingDiagnosisController = TextEditingController();
-  TextEditingController _enfermeiroController = TextEditingController(); // Renomeie para enfermeiroController
+  TextEditingController _enfermeiroController = TextEditingController();
+  TextEditingController _leitoController = TextEditingController();
 
   // Referência para a coleção "enfermeiros" no Firestore
   CollectionReference _enfermeirosRef = FirebaseFirestore.instance.collection('enfermeiros');
@@ -54,6 +55,7 @@ class _AddPacienteState extends State<AddPaciente> {
         'alergias': _allergiesController.text,
         'sintomas': _symptomsController.text,
         'diagnostico_enfermagem': _nursingDiagnosisController.text,
+        'leito_paciente': _leitoController.text,
         'enfermeiro(a)': _enfermeiroController.text, // Use o nome do enfermeiro(a) atual
       });
 
@@ -64,6 +66,7 @@ class _AddPacienteState extends State<AddPaciente> {
       _allergiesController.clear();
       _symptomsController.clear();
       _nursingDiagnosisController.clear();
+      _leitoController.clear();
 
       // Feedback de sucesso
       ScaffoldMessenger.of(context).showSnackBar(
@@ -88,12 +91,8 @@ class _AddPacienteState extends State<AddPaciente> {
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-          'Adicionar Paciente',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+          'Adicionar Paciente', style: TextStyle(color: Colors.white),),
+        backgroundColor: Colors.blue,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
@@ -138,6 +137,14 @@ class _AddPacienteState extends State<AddPaciente> {
             ),
             SizedBox(height: 16.0),
             TextFormField(
+              controller: _leitoController,
+              decoration: InputDecoration(
+                labelText: 'Leito',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 16.0),
+            TextFormField(
               controller: _clinicalHistoryController,
               decoration: InputDecoration(
                 labelText: 'Histórico Clínico',
@@ -167,7 +174,7 @@ class _AddPacienteState extends State<AddPaciente> {
             TextFormField(
               controller: _nursingDiagnosisController,
               decoration: InputDecoration(
-                labelText: 'Diagnóstico de Enfermagem',
+                labelText: 'Possíveis Diagnósticos de Enfermagem',
                 border: OutlineInputBorder(),
               ),
               maxLines: 3,
@@ -205,6 +212,7 @@ class _AddPacienteState extends State<AddPaciente> {
     _symptomsController.dispose();
     _nursingDiagnosisController.dispose();
     _enfermeiroController.dispose();
+    _leitoController.dispose();
     super.dispose();
   }
 }
