@@ -76,7 +76,7 @@ class _PacienteScreenState extends State<PacienteScreen> {
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-          'Lista de Pacientes',
+          'Meus Pacientes',
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,

@@ -14,6 +14,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   bool _isLoading = false;
+  bool _isPasswordVisible = false; 
 
   Future<void> _login(BuildContext context) async {
     try {
@@ -95,7 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.blueAccent, Colors.lightBlueAccent],
+            colors: [Colors.indigo, Colors.lightBlueAccent],
           ),
         ),
         child: Center(
@@ -133,6 +134,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: InputDecoration(
                     labelText: 'Password',
                     prefixIcon: Icon(Icons.lock, color: Colors.white),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isPasswordVisible = !_isPasswordVisible;
+                        });
+                      },
+                    ),
                     filled: true,
                     fillColor: Colors.white.withOpacity(0.3),
                     border: OutlineInputBorder(
@@ -140,7 +152,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       borderSide: BorderSide.none,
                     ),
                   ),
-                  obscureText: true,
+                  obscureText: !_isPasswordVisible, // Mostrar/ocultar a senha com base na variável _isPasswordVisible
                 ),
                 SizedBox(height: 20.0),
                 ElevatedButton(
