@@ -186,9 +186,9 @@ class _AddCartilhaState extends State<AddCartilha> {
     return Scaffold(
       appBar: AppBar(
         title:
-            Text('Adicionar Cartilha', style: TextStyle(color: Colors.white)),
+            Text('Adicionar PDF', style: TextStyle(color: Colors.white)),
         centerTitle: true,
-        backgroundColor: Color(0xFF021F38),
+        backgroundColor: Colors.blue,
         iconTheme: IconThemeData(color: Colors.white),
       ),
       body: Padding(
@@ -242,7 +242,7 @@ class _AddCartilhaState extends State<AddCartilha> {
                   _pickFiles();
                 },
                 icon: Icon(Icons.attach_file),
-                label: Text('Adicionar Cartilha'),
+                label: Text('Adicionar PDF'),
               ),
               SizedBox(height: 16.0),
               Column(
