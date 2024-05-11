@@ -50,6 +50,11 @@ class _CadastroScreenState extends State<CadastroScreen> {
     }
   }
 
+  String _capitalize(String input) {
+    if (input.isEmpty) return '';
+    return input.substring(0, 1).toUpperCase() + input.substring(1);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,6 +105,7 @@ class _CadastroFormState extends State<CadastroForm> {
           TextFormField(
             controller: widget.nomeController,
             decoration: InputDecoration(labelText: 'Nome'),
+            textCapitalization: TextCapitalization.words,
             validator: (value) {
               if (value!.isEmpty) {
                 return 'Por favor, insira seu nome';

@@ -1,3 +1,4 @@
+import 'package:corenproject/paciente/DetalhesPaciente.dart';
 import 'package:corenproject/paciente/addpaciente.dart';
 import 'package:corenproject/sign/LoginScreen.dart';
 import 'package:flutter/material.dart';
@@ -11,54 +12,31 @@ class PacienteScreen extends StatefulWidget {
 
 class _PacienteScreenState extends State<PacienteScreen> {
   TextEditingController _searchController = TextEditingController();
-  List<String> _users = [
-    'Usuário 1',
-    'Usuário 2',
-    'Usuário 3',
-    'Usuário 4',
-    'Usuário 5',
-    'Usuário 6',
-  ];
-  List<String> _filteredUsers = [];
-  bool _isAdmin = false; // Defina isso com base nos dados do usuário
+  String? _currentEnfermeiro;
+  late Stream<QuerySnapshot> _pacientesStream;
 
   @override
   void initState() {
-    _filteredUsers.addAll(_users);
     super.initState();
-    _checkAdminStatus();
+    _checkUser();
   }
 
-  Future<void> _checkAdminStatus() async {
+  Future<void> _checkUser() async {
     String uid = FirebaseAuth.instance.currentUser!.uid;
     DocumentSnapshot snapshot = await FirebaseFirestore.instance
         .collection('enfermeiros')
         .doc(uid)
         .get();
 
-    if (snapshot.exists) {
-      Map<String, dynamic> userData = snapshot.data() as Map<String, dynamic>;
-      setState(() {
-        _isAdmin = userData['admin'] ?? false;
-      });
-    }
-  }
-
-  void _filterUsers(String query) {
-    List<String> filteredList = [];
-    if (query.isNotEmpty) {
-      _users.forEach((user) {
-        if (user.toLowerCase().contains(query.toLowerCase())) {
-          filteredList.add(user);
-        }
-      });
-    } else {
-      filteredList.addAll(_users);
-    }
     setState(() {
-      _filteredUsers.clear();
-      _filteredUsers.addAll(filteredList);
+      _currentEnfermeiro = snapshot.get('nome');
     });
+
+    // Recupera todos os pacientes do Firestore
+    _pacientesStream = FirebaseFirestore.instance
+        .collection('pacientes')
+        .where('enfermeiro(a)', isEqualTo: _currentEnfermeiro)
+        .snapshots();
   }
 
   void _signOut(BuildContext context) async {
@@ -72,84 +50,152 @@ class _PacienteScreenState extends State<PacienteScreen> {
     } catch (error) {
       print('Erro ao sair da conta: $error');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao sair da conta. Por favor, tente novamente.',), backgroundColor: Colors.red,),
+        SnackBar(
+          content: Text(
+            'Erro ao sair da conta. Por favor, tente novamente.',
+          ),
+          backgroundColor: Colors.red,
+        ),
       );
     }
+  }
+
+  void _verDetalhesPaciente(
+      BuildContext context, QueryDocumentSnapshot<Object?> paciente) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => DetalhesPaciente(
+              paciente: paciente.data() as Map<String, dynamic>)),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: Text(
-            'Lista de Usuários',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text(
+          'Lista de Pacientes',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.blue,
+        actions: [
+          IconButton(
+            onPressed: () => _signOut(context),
+            icon: Icon(
+              Icons.exit_to_app,
+              color: Colors.red,
+            ),
+          )
+        ],
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                labelText: 'Pesquisar Paciente',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (value) {
+                setState(() {});
+              },
             ),
           ),
-          backgroundColor: Colors.blue,
-          actions: [
-            IconButton(
-                onPressed: () => _signOut(context),
-                icon: Icon(
-                  Icons.exit_to_app,
-                  color: Colors.red,
-                ))
-          ],
-        ),
-        body: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  labelText: 'Pesquisar',
-                  hintText: 'Digite o nome do usuário',
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                ),
-                onChanged: _filterUsers,
-              ),
-            ),
-            Expanded(
-              child: _filteredUsers.isEmpty
-                  ? Center(
-                      child: Text(
-                        'Nenhum usuário encontrado',
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    )
-                  : ListView.builder(
-                      itemCount: _filteredUsers.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Card(
-                          margin: EdgeInsets.symmetric(
-                            horizontal: 10.0,
-                            vertical: 5.0,
-                          ),
-                          child: ListTile(
-                            title: Text(_filteredUsers[index]),
+          Expanded(
+            child: _currentEnfermeiro != null
+                ? StreamBuilder(
+                    stream: _pacientesStream,
+                    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+
+                      if (snapshot.hasError) {
+                        return Center(
+                          child: Text('Erro: ${snapshot.error}'),
+                        );
+                      }
+
+                      if (snapshot.data!.docs.isEmpty) {
+                        return Center(
+                          child: Text(
+                            'Nenhum paciente encontrado',
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         );
-                      },
-                    ),
-            ),
-          ],
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => AddPaciente()));
-          },
-          child: Icon(Icons.add),
-        ));
+                      }
+
+                      // Filtra localmente os pacientes pelo nome
+                      var filteredPacientes = snapshot.data!.docs.where((paciente) =>
+                          paciente['nome'].toLowerCase().contains(_searchController.text.toLowerCase()));
+
+                      if (filteredPacientes.isEmpty) {
+                        return Center(
+                          child: Text(
+                            'Nenhum paciente encontrado',
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        );
+                      }
+
+                      return ListView.builder(
+                        itemCount: filteredPacientes.length,
+                        itemBuilder: (context, index) {
+                          var paciente = filteredPacientes.elementAt(index);
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 8.0, horizontal: 16.0),
+                            child: Card(
+                              elevation: 3,
+                              child: ListTile(
+                                title: Text(
+                                  paciente['nome'],
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                    'Sexo: ${paciente['sexo']}, Idade: ${paciente['idade']}'),
+                                onTap: () => _verDetalhesPaciente(context, paciente),
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  )
+                : Center(
+                    child: CircularProgressIndicator(),
+                  ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddPaciente()),
+          );
+        },
+        child: Icon(Icons.add),
+      ),
+    );
   }
 }
