@@ -116,7 +116,7 @@ class ChatMessage extends StatelessWidget {
               children: <Widget>[
                 Text(
                   nurseName,
-                  style: Theme.of(context).textTheme.subtitle1,
+                  style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                 ),
                 Container(
                   margin: const EdgeInsets.only(top: 5.0),
